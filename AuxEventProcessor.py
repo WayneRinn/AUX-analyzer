@@ -162,12 +162,16 @@ class AuxEventProcessor:
 
 		return find_link_address_msg
 
-	def get_link_training_result(self):
+	def get_link_training_result_from_line(self, line_num):
 		# 0x00102 to set training pattern
 		pass
 
-	def get_side_band_msg_from_line(self, line_num):
+	def get_payload_table_from_line(self, line_num):
 		pass
+
+	def get_all_side_band_msg_from_line(self, line_num):
+		pass
+
 	def get_any_error_from_log(self):
 		for idx in range(0, len(self.log)):
 			last_item_idx = len(self.log[idx]["detail"]) - 1
