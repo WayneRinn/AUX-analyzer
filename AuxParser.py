@@ -44,6 +44,12 @@ if __name__ == '__main__':
 		else:
 			line = 0
 		aux_event_pro.get_link_address_result(line)
+	elif str(sys.argv[2]) == "-lt":
+		if len(sys.argv) > 3:
+			line = int(str(sys.argv[3]))
+		else:
+			line = 0
+		aux_event_pro.get_link_training_result_from_line(line)
 	else:
 		analyzing_str_line = str(sys.argv[2])
 		print("start analyze Aux report")

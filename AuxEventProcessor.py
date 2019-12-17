@@ -2,11 +2,22 @@ class AuxEventProcessor:
 	def __init__(self, log):
 		self.log = log
 
-	def get_idx_of_particular_string_in_log_short_from_specific_line(self, str_to_find, str_idx):
+	def get_idx_of_particular_string_in_log_short_from_line(self, str_to_find, str_idx):
 		for idx in range(str_idx, len(self.log)):
 			short_msg = self.log[idx]["short"][0]
 			if short_msg.find(str_to_find) != -1:
 				return idx
+		return False
+
+	def get_idx_of_particular_dpcd_addr_value_in_log_detail_from_line(self, addr_to_find, value, str_idx):
+		for idx in range(str_idx, len(self.log)):
+			short_msg = self.log[idx]["short"][0]
+			if short_msg.find(addr_to_find) != -1:
+				detail_msg = self.log[idx]["detail"][4]
+				detail_msg_seg = detail_msg.split('<br>')
+				for idx2 in range(0, len(detail_msg_seg)):
+					if detail_msg_seg[idx2].find(value) != -1:
+						return idx
 		return False
 
 	def get_idx_of_last_particular_string_in_log_short(self, str_to_find):
@@ -164,7 +175,46 @@ class AuxEventProcessor:
 
 	def get_link_training_result_from_line(self, line_num):
 		# 0x00102 to set training pattern
-		pass
+		find_lt_msg = False
+		str_idx = line_num
+		lt_str_idx = self.get_idx_of_particular_string_in_log_short_from_line("to 0x00102", str_idx)
+		while lt_str_idx != False:
+			lt_end_idx = self.get_idx_of_particular_dpcd_addr_value_in_log_detail_from_line("to 0x00102", "0x00102 := 0x00", lt_str_idx)
+			if lt_end_idx == False:
+				print("Can't find the end of LT\n")
+				return find_lt_msg
+			# interval of LT
+			find_lt_msg = True
+			print('---\n')
+			print("Find LT start at line:" + str(lt_str_idx + 1) + " and end at line:" + str(lt_end_idx + 1) +"\nLT final result:\n")
+			for idx in range(lt_end_idx -1, lt_str_idx, -1):
+				short_msg = self.log[idx]["short"][0]
+				if short_msg.find('to 0x00102') != -1:
+					detail_msg = self.log[idx]["detail"][4]
+					detail_msg = detail_msg.replace("</p>","<br>")
+					detail_msg_seg = detail_msg.split('<br>')
+					for idx2 in range(0, len(detail_msg_seg)):
+						if (detail_msg_seg[idx2].find("Line #") != -1 or
+							detail_msg_seg[idx2].find("Req WR") != -1):
+							continue
+						print(detail_msg_seg[idx2])
+					break;
+			for idx3 in range(lt_end_idx -1, lt_str_idx, -1):
+				short_msg = self.log[idx3]["short"][0]
+				if short_msg.find('from 0x00202') != -1:
+					detail_msg = self.log[idx3 + 1]["detail"][4]
+					detail_msg = detail_msg.replace("</p>","<br>")
+					detail_msg_seg = detail_msg.split('<br>')
+					for idx4 in range(0, len(detail_msg_seg)):
+						if (detail_msg_seg[idx4].find("Line #") != -1 or
+							detail_msg_seg[idx4].find("AUX_ACK") != -1):
+							continue
+						print(detail_msg_seg[idx4])
+					break;
+
+			str_idx = lt_end_idx + 1
+			lt_str_idx = self.get_idx_of_particular_string_in_log_short_from_line("to 0x00102", str_idx)
+		return find_lt_msg
 
 	def get_payload_table_from_line(self, line_num):
 		pass
