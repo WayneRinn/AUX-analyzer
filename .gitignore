@@ -1,0 +1,4 @@
+*.DS_Store
+*.html
+var_log*
+*.pyc

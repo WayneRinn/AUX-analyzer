@@ -31,7 +31,7 @@ class LogProcessor:
 						enc_txt_entry = False
 					else:
 						tmp_txt_enrty.append(line.replace(',', ''))
-			else:	
+			else:
 				#when hit the bottom of the log
 				if line.find('tbl_AllDetails') != -1:
 					break
@@ -42,8 +42,9 @@ class LogProcessor:
 
 		file.close()
 
-		self.print_var_log_short()
-		self.print_var_log_detail()
+		return self.log
+		# self.print_var_log_short()
+		# self.print_var_log_detail()
 
 	def print_var_log_short(self):
 		tmpFile = open("var_log_short.txt", "w")
